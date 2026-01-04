@@ -267,9 +267,9 @@
             resultDiv.classList.remove('hidden');
             resultDiv.innerHTML = '<img src="https://thumb.ac-illust.com/ca/ca19b1b823b60a02eeb8db837fd866db_t.jpeg" class="game-img" alt="かわいい狼"><br>';
             if (wolfPositions.includes(myNumber)) {
-                resultDiv.innerHTML += `<strong style="color:red; font-size:48px;">あなたはワードウルフ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.minority}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">紛れ込んだ狼を特定せよ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.minority}</strong>`;
             } else {
-                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">あなたは多数派！👥</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.majority}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">紛れ込んだ狼を特定せよ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.majority}</strong>`;
             }
             resultDiv.innerHTML += `<br><br><small style="font-size:24px;">議論スタート！🕒</small>`;
 
@@ -376,3 +376,4 @@
     </script>
 </body>
 </html>
+
