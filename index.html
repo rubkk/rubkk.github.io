@@ -4,40 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPBワードウルフ</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
-        input, button { padding: 12px; margin: 10px; font-size: 18px; }
-        #setup { margin: 30px; }
-        #timer { font-size: 48px; font-weight: bold; color: #333; margin: 50px; }
-        #result { font-size: 24px; margin: 50px; padding: 20px; background: white; border: 2px solid #ccc; min-height: 100px; }
-        .hidden { display: none; }
-        #guide { font-size: 20px; color: #555; margin: 20px; }
+        body { 
+            font-family: 'M PLUS Rounded 1c', sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+            background: linear-gradient(to bottom, #f0f8ff, #e0f7fa); 
+            font-size: 20px; 
+            color: #333;
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 150px; /* ボタン分の余白を確保 */
+        }
+        h1 { font-size: 48px; margin-bottom: 30px; }
+        input, button, select { 
+            padding: 15px; 
+            margin: 15px; 
+            font-size: 22px; 
+            border-radius: 10px; 
+            border: 2px solid #aaa;
+            background: white;
+        }
+        #setup { 
+            margin: 40px auto; 
+            max-width: 600px; 
+            background: #fff; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+        }
+        #timer { 
+            font-size: 52px; 
+            margin: 60px; 
+            position: relative; 
+            z-index: 101; /* 時計を最前面に！ */
+            background: rgba(255,255,255,0.8); 
+            padding: 10px 20px; 
+            border-radius: 15px; 
+        }
+        #discussionTimer { font-size: 90px; margin: 50px; text-shadow: 4px 4px 10px #aaa; }
+        #result { 
+            font-size: 28px; 
+            margin: 60px auto; 
+            max-width: 800px; 
+            padding: 40px; 
+            background: white; 
+            border: 5px dashed #888; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+        }
+        .hidden { display: none !important; }
+        #guide { 
+            font-size: 26px; 
+            margin: 40px; 
+            font-weight: bold; 
+            color: #444; 
+            position: relative; 
+            z-index: 1; 
+        }
+        #voteSection, #resultSection { 
+            font-size: 24px; 
+            margin: 40px auto; 
+            max-width: 600px; 
+            padding: 30px; 
+            background: #e8f4f8; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); 
+        }
+        .win { color: #0a0; font-size: 52px; animation: bounce 1.5s infinite; }
+        .lose { color: #c00; font-size: 52px; animation: shake 0.8s; }
+        #nextGameBtn { 
+            padding: 30px 70px; 
+            font-size: 40px; 
+            margin: 80px auto; 
+            background: linear-gradient(#4CAF50, #388e3c); 
+            color: white; 
+            border: none; 
+            border-radius: 40px; 
+            cursor: pointer; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 10;
+        }
+        #nextGameBtn:hover { transform: scale(1.1); }
+        /* お題を見るボタン：さらに下に移動して小さく */
+        #revealBtn {
+            padding: 16px 45px;
+            font-size: 30px;
+            background: linear-gradient(#ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: fixed;
+            bottom: 30px; /* さらに下に！ */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        #revealBtn:hover { 
+            transform: translateX(-50%) scale(1.1); 
+            background: #ff5252; 
+        }
+        img.game-img { 
+            max-width: 400px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); 
+            margin: 30px auto; 
+            display: block; 
+        }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-40px); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-20px); } 75% { transform: translateX(20px); } }
     </style>
 </head>
 <body>
-    <h1>BPBワードウルフ</h1>
+    <h1>🐺 BPBワードウルフ 🎉</h1>
 
     <div id="setup">
         <p>プレイヤー数: <input type="number" id="players" value="5" min="3"></p>
         <p>ウルフ数: <input type="number" id="wolves" value="1" min="1"></p>
         <p>あなたのプレイヤー番号: <input type="number" id="myNumber" value="1" min="1"></p>
-         タイミング猶予: <input type="number" id="tolerance" value="2" min="1" max="10"> 秒（2おすすめ）
-         <button id="startBtn" onclick="startGame()">ゲーム開始！</button>
+        <button id="startBtn" onclick="startGame()">ゲーム開始！ 🚀</button>
     </div>
 
     <div id="guide" class="hidden">
         <p>進行役が時間を指定するので、<br>その時間にボタンを押してください！</p>
-        <p><strong>±<span id="tolDisplay">2</span>秒以内</strong>なら全員同じお題になります</p>
+        <p><strong>±2秒以内</strong>に押せば全員同じお題になります</p>
     </div>
 
     <div id="timer" class="hidden">待機中…</div>
 
-    <button id="revealBtn" class="hidden" onclick="revealWord()">今！お題を見る</button>
+    <button id="revealBtn" class="hidden" onclick="revealWord()">今！お題を見る 🔥</button>
 
-    <div id="result"></div>
+    <div id="result" class="hidden"></div>
+
+    <div id="discussionTimer" class="hidden">3:00</div>
+
+    <div id="voteSection" class="hidden">
+        <h2>投票フェーズ</h2>
+        <p>誰を追放票に入れますか？</p>
+        <select id="voteTarget"></select>
+        <br>
+        <button onclick="submitVote()">投票する</button>
+        <p id="myVote"></p>
+    </div>
+
+    <div id="resultSection" class="hidden">
+        <h2>結果発表（進行役操作）</h2>
+        <p>口頭集計後の追放者番号を入力:</p>
+        <input type="number" id="banished" min="1" placeholder="例: 3">
+        <button onclick="showFinalResult()">結果を見る</button>
+    </div>
+
+    <button id="nextGameBtn" class="hidden" onclick="nextGame()">次のゲームへ 🎊</button>
+
+    <!-- 効果音 -->
+    <audio id="victorySound" src="https://freesound.org/data/previews/466/466133_9033262-lq.mp3"></audio>
+    <audio id="loseSound" src="https://freesound.org/data/previews/73/73581_634166-lq.mp3"></audio>
+    <audio id="beepSound" src="https://cdn.pixabay.com/download/audio/2022/05/24/audio_8e2e6f7d6d.mp3?filename=beep-6269.mp3"></audio>
 
     <script>
-        // お題ペアの例（もっと追加したい場合はここに増やしてください）
         const themes = [
             { majority: "ささやきベラドンナの毒弓", minority: "ベラドンナの影毒弓" },
             { majority: "赤ランの首飾り", minority: "白ユリの首飾り" },
@@ -84,14 +212,15 @@
             { majority: "突きキバの短弓", minority: "フォルトゥナの願い弓" }
 ];
 
+
         let selectedTheme = null;
         let wolfPositions = [];
+        let discussionInterval = null;
 
         function startGame() {
             const players = parseInt(document.getElementById('players').value);
             const wolves = parseInt(document.getElementById('wolves').value);
             const myNumber = parseInt(document.getElementById('myNumber').value);
-            const tolerance = parseInt(document.getElementById('tolerance').value);
 
             if (myNumber < 1 || myNumber > players) {
                 alert("正しいプレイヤー番号を入力してください！");
@@ -102,9 +231,7 @@
             document.getElementById('guide').classList.remove('hidden');
             document.getElementById('timer').classList.remove('hidden');
             document.getElementById('revealBtn').classList.remove('hidden');
-            document.getElementById('tolDisplay').textContent = tolerance;
 
-            // 現在時刻をリアルタイム表示（タイミング取りやすい）
             const timerDiv = document.getElementById('timer');
             setInterval(() => {
                 const now = new Date();
@@ -116,14 +243,10 @@
             const players = parseInt(document.getElementById('players').value);
             const wolves = parseInt(document.getElementById('wolves').value);
             const myNumber = parseInt(document.getElementById('myNumber').value);
-            const tolerance = parseInt(document.getElementById('tolerance').value);
 
             const now = new Date().getTime();
-
-            // ★修正ポイント：秒を「tolerance秒単位」で丸める（例: tolerance=2 → 2秒区切り）
+            const tolerance = 2;
             const roundedTime = Math.floor(now / 1000 / tolerance) * tolerance * 1000;
-
-            // シード作成（ゲーム設定も加えて完全同期）
             let seed = roundedTime + players * 100000 + wolves * 10000;
 
             function seededRandom() {
@@ -131,34 +254,125 @@
                 return (seed - 1) / 2147483646;
             }
 
-            // お題選択
             const themeIndex = Math.floor(seededRandom() * themes.length);
             selectedTheme = themes[themeIndex];
 
-            // ウルフ位置決定
             wolfPositions = [];
             while (wolfPositions.length < wolves) {
                 const pos = Math.floor(seededRandom() * players) + 1;
                 if (!wolfPositions.includes(pos)) wolfPositions.push(pos);
             }
 
-            // 結果表示
             const resultDiv = document.getElementById('result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = '<img src="https://thumb.ac-illust.com/ca/ca19b1b823b60a02eeb8db837fd866db_t.jpeg" class="game-img" alt="かわいい狼"><br>';
             if (wolfPositions.includes(myNumber)) {
-                resultDiv.innerHTML = `<strong style="color:biue; font-size:36px;">紛れ込んだ狼を特定せよ！</strong><br><br>お題: <strong>${selectedTheme.minority}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:red; font-size:48px;">あなたはワードウルフ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.minority}</strong>`;
             } else {
-                resultDiv.innerHTML = `<strong style="color:blue; font-size:36px;">紛れ込んだ狼を特定せよ！</strong><br><br>お題: <strong>${selectedTheme.majority}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">あなたは多数派！👥</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.majority}</strong>`;
             }
+            resultDiv.innerHTML += `<br><br><small style="font-size:24px;">議論スタート！🕒</small>`;
 
-            resultDiv.innerHTML += `<br><br><small>全員確認したら議論開始！</small>`;
-
-            // 操作部分を隠す
             document.getElementById('revealBtn').classList.add('hidden');
             document.getElementById('timer').classList.add('hidden');
             document.getElementById('guide').classList.add('hidden');
+
+            startDiscussionTimer();
+            initVoteOptions();
+        }
+
+        function startDiscussionTimer() {
+            document.getElementById('discussionTimer').classList.remove('hidden');
+            let timeLeft = 180;
+            const timerDiv = document.getElementById('discussionTimer');
+
+            discussionInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDiv.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 30) timerDiv.style.color = '#f00';
+                if (timeLeft <= 10 && timeLeft > 0) {
+                    document.getElementById('beepSound').play();
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(discussionInterval);
+                    timerDiv.textContent = "時間終了！投票へ";
+                    timerDiv.style.color = '#900';
+                    document.getElementById('voteSection').classList.remove('hidden');
+                    document.getElementById('resultSection').classList.remove('hidden');
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        function initVoteOptions() {
+            const players = parseInt(document.getElementById('players').value);
+            const select = document.getElementById('voteTarget');
+            select.innerHTML = '';
+            for (let i = 1; i <= players; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${i}番`;
+                select.appendChild(option);
+            }
+        }
+
+        function submitVote() {
+            const voteTarget = parseInt(document.getElementById('voteTarget').value);
+            if (!voteTarget) {
+                alert("投票先を選択してください！");
+                return;
+            }
+            document.getElementById('myVote').innerHTML = `<strong style="font-size:28px;">あなたの投票: ${voteTarget}番</strong>`;
+            document.querySelector('#voteSection button').disabled = true;
+        }
+
+        function showFinalResult() {
+            const banished = parseInt(document.getElementById('banished').value);
+            if (!banished) {
+                alert("追放者番号を入力してください！");
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            const isWolfBanished = wolfPositions.includes(banished);
+
+            if (isWolfBanished) {
+                resultDiv.innerHTML += `<br><img src="https://img.freepik.com/premium-photo/animated-victory-celebration-with-trophy-confetti-isolated-with-white-highlights_660230-185310.jpg" class="game-img" alt="勝利祝賀"><br><div class="win">🎉 多数派（市民）の勝利！ 🎉</div><br>`;
+                resultDiv.innerHTML += `<strong style="font-size:36px;">追放者 ${banished}番 はワードウルフでした！</strong><br><br>`;
+                document.getElementById('victorySound').play();
+            } else {
+                resultDiv.innerHTML += `<br><img src="https://media.tenor.com/nq6C5xO1W0gAAAAM/trombone-pusheen.gif" class="game-img" alt="サッドトロンボーン"><br><div class="lose">😈 少数派（ワードウルフ）の勝利！ 😈</div><br>`;
+                resultDiv.innerHTML += `<strong style="font-size:36px;">追放者 ${banished}番 は多数派でした...</strong><br><br>`;
+                document.getElementById('loseSound').play();
+            }
+
+            resultDiv.innerHTML += `<strong style="font-size:32px;">ワードウルフは ${wolfPositions.join(', ')}番 でした！</strong>`;
+
+            document.getElementById('voteSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('discussionTimer').classList.add('hidden');
+
+            document.getElementById('nextGameBtn').classList.remove('hidden');
+        }
+
+        function nextGame() {
+            if (discussionInterval) clearInterval(discussionInterval);
+
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('discussionTimer').classList.add('hidden');
+            document.getElementById('voteSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('nextGameBtn').classList.add('hidden');
+            document.getElementById('myVote').innerHTML = '';
+            if (document.querySelector('#voteSection button')) {
+                document.querySelector('#voteSection button').disabled = false;
+            }
+
+            document.getElementById('setup').classList.remove('hidden');
         }
     </script>
 </body>
 </html>
-
-
