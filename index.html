@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>シンプルワードウルフ（完璧タイミング同期版）</title>
+    <title>BPBワードウルフ</title>
     <style>
         body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
         input, button { padding: 12px; margin: 10px; font-size: 18px; }
@@ -15,7 +15,7 @@
     </style>
 </head>
 <body>
-    <h1>シンプルワードウルフ（完璧タイミング同期版）</h1>
+    <h1>BPBワードウルフ</h1>
 
     <div id="setup">
         <p>プレイヤー数: <input type="number" id="players" value="5" min="3"></p>
@@ -26,7 +26,7 @@
     </div>
 
     <div id="guide" class="hidden">
-        <p>進行役が「3、2、1、ドン！」と言ったら、<br>みんなでほぼ同時にボタンを押してください！</p>
+        <p>進行役が時間を指定するので、<br>その時間にボタンを押してください！</p>
         <p><strong>±<span id="tolDisplay">2</span>秒以内</strong>なら全員同じお題になります</p>
     </div>
 
@@ -145,9 +145,9 @@
             // 結果表示
             const resultDiv = document.getElementById('result');
             if (wolfPositions.includes(myNumber)) {
-                resultDiv.innerHTML = `<strong style="color:red; font-size:36px;">あなたはワードウルフ！</strong><br><br>お題: <strong>${selectedTheme.minority}</strong>`;
+                resultDiv.innerHTML = `<strong style="color:biue; font-size:36px;">紛れ込んだ狼を特定せよ！</strong><br><br>お題: <strong>${selectedTheme.minority}</strong>`;
             } else {
-                resultDiv.innerHTML = `<strong style="color:blue; font-size:36px;">あなたは多数派！</strong><br><br>お題: <strong>${selectedTheme.majority}</strong>`;
+                resultDiv.innerHTML = `<strong style="color:blue; font-size:36px;">紛れ込んだ狼を特定せよ！</strong><br><br>お題: <strong>${selectedTheme.majority}</strong>`;
             }
 
             resultDiv.innerHTML += `<br><br><small>全員確認したら議論開始！</small>`;
@@ -160,3 +160,4 @@
     </script>
 </body>
 </html>
+
