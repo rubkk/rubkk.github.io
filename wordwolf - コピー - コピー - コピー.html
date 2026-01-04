@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シンプルワードウルフ（完璧タイミング同期版）</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
+        input, button { padding: 12px; margin: 10px; font-size: 18px; }
+        #setup { margin: 30px; }
+        #timer { font-size: 48px; font-weight: bold; color: #333; margin: 50px; }
+        #result { font-size: 24px; margin: 50px; padding: 20px; background: white; border: 2px solid #ccc; min-height: 100px; }
+        .hidden { display: none; }
+        #guide { font-size: 20px; color: #555; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>シンプルワードウルフ（完璧タイミング同期版）</h1>
+
+    <div id="setup">
+        <p>プレイヤー数: <input type="number" id="players" value="5" min="3"></p>
+        <p>ウルフ数: <input type="number" id="wolves" value="1" min="1"></p>
+        <p>あなたのプレイヤー番号: <input type="number" id="myNumber" value="1" min="1"></p>
+         <p>タイミング猶予: <input type="number" id="tolerance" value="2" min="1" max="10"> 秒（2おすすめ）</p>
+         <button id="startBtn" onclick="startGame()">ゲーム開始！</button>
+    </div>
+
+    <div id="guide" class="hidden">
+        <p>進行役が「3、2、1、ドン！」と言ったら、<br>みんなでほぼ同時にボタンを押してください！</p>
+        <p><strong>±<span id="tolDisplay">2</span>秒以内</strong>なら全員同じお題になります</p>
+    </div>
+
+    <div id="timer" class="hidden">待機中…</div>
+
+    <button id="revealBtn" class="hidden" onclick="revealWord()">今！お題を見る</button>
+
+    <div id="result"></div>
+
+    <script>
+        // お題ペアの例（もっと追加したい場合はここに増やしてください）
+        const themes = [
+            { majority: "ささやきベラドンナの毒弓", minority: "ベラドンナの影毒弓" },
+            { majority: "赤ランの首飾り", minority: "白ユリの首飾り" },
+            { majority: "白のクイーン", minority: "黒のクイーン" },
+            { majority: "コールドミラー", minority: "アイスフラワー" },
+            { majority: "メイジの帽子", minority: "憎たらしい帽子・ハロルド" },
+            { majority: "招きネコ", minority: "ネコの精霊" },
+            { majority: "古代の石：フリーズ", minority: "古代の石：フレイム" },
+            { majority: "木の剣", minority: "ホウキ" },
+            { majority: "ホウキ", minority: "シャベル" },
+            { majority: "月の盾", minority: "月の鎧" },
+            { majority: "ホウキ", minority: "シャベル" },
+            { majority: "ネズミ", minority: "ハリネズミ" },
+            { majority: "ミス・フォーチュン", minority: "ミセス・ストラグルズ" },
+            { majority: "ハイマナポーション", minority: "マナポーション" },
+            { majority: "コールドミラー", minority: "アイスフラワー" },
+            { majority: "メイジの帽子", minority: "憎たらしい帽子・ハロルド" },
+            { majority: "招きネコ", minority: "ネコの精霊" },
+            { majority: "古代の石：フリーズ", minority: "古代の石：フレイム" },
+            { majority: "ヒートスピア", minority: "ヒートダガー" },
+            { majority: "ホウキ", minority: "シャベル" },
+            { majority: "常炎", minority: "ソラリス" },
+            { majority: "ダブルアックス", minority: "ベリーロングスピア" },
+            { majority: "富のブタちゃん", minority: "幸運のブタちゃん" },
+            { majority: "ヘビ", minority: "カメ" },
+            { majority: "破滅のグレートソード", minority: "あまりにも大きすぎるブラッドソーン" },
+            { majority: "カタナ", minority: "チェーンウィップ" },
+            { majority: "便利ポーチ", minority: "学者のカバン" },
+            { majority: "カップケーキ・スラバート", minority: "ライト・スラバート" },
+            { majority: "極楽チュン", minority: "カラス" },
+            { majority: "ダブルレインボー", minority: "レインボーバッジ" },
+            { majority: "アナグマのルーン", minority: "武器エンチャント" },
+            { majority: "プラチナ会員カード", minority: "ユニークなユニーク" },
+            { majority: "ちょっと力を！", minority: "もっと力を！" },
+            { majority: "キノコ農園", minority: "深堀り" },
+            { majority: "勇敢な子狼", minority: "力持ちの子狼" },
+            { majority: "活力のパズルバッグ", minority: "活力のアミュレット" },
+            { majority: "未鑑定のアミュレット", minority: "未知のスキル" },
+            { majority: "財宝の箱", minority: "富の宝箱" },
+            { majority: "燃えるたいまつ", minority: "魔法のたいまつ" },
+            { majority: "ウイングブーツ", minority: "石のブーツ" },
+            { majority: "王の冠", minority: "輝ける王冠" },
+            { majority: "キング・スラバート", minority: "ホーリースピア" },
+            { majority: "突きキバの短弓", minority: "フォルトゥナの願い弓" }
+];
+
+        let selectedTheme = null;
+        let wolfPositions = [];
+
+        function startGame() {
+            const players = parseInt(document.getElementById('players').value);
+            const wolves = parseInt(document.getElementById('wolves').value);
+            const myNumber = parseInt(document.getElementById('myNumber').value);
+            const tolerance = parseInt(document.getElementById('tolerance').value);
+
+            if (myNumber < 1 || myNumber > players) {
+                alert("正しいプレイヤー番号を入力してください！");
+                return;
+            }
+
+            document.getElementById('setup').classList.add('hidden');
+            document.getElementById('guide').classList.remove('hidden');
+            document.getElementById('timer').classList.remove('hidden');
+            document.getElementById('revealBtn').classList.remove('hidden');
+            document.getElementById('tolDisplay').textContent = tolerance;
+
+            // 現在時刻をリアルタイム表示（タイミング取りやすい）
+            const timerDiv = document.getElementById('timer');
+            setInterval(() => {
+                const now = new Date();
+                timerDiv.textContent = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }, 100);
+        }
+
+        function revealWord() {
+            const players = parseInt(document.getElementById('players').value);
+            const wolves = parseInt(document.getElementById('wolves').value);
+            const myNumber = parseInt(document.getElementById('myNumber').value);
+            const tolerance = parseInt(document.getElementById('tolerance').value);
+
+            const now = new Date().getTime();
+
+            // ★修正ポイント：秒を「tolerance秒単位」で丸める（例: tolerance=2 → 2秒区切り）
+            const roundedTime = Math.floor(now / 1000 / tolerance) * tolerance * 1000;
+
+            // シード作成（ゲーム設定も加えて完全同期）
+            let seed = roundedTime + players * 100000 + wolves * 10000;
+
+            function seededRandom() {
+                seed = (seed * 16807) % 2147483647;
+                return (seed - 1) / 2147483646;
+            }
+
+            // お題選択
+            const themeIndex = Math.floor(seededRandom() * themes.length);
+            selectedTheme = themes[themeIndex];
+
+            // ウルフ位置決定
+            wolfPositions = [];
+            while (wolfPositions.length < wolves) {
+                const pos = Math.floor(seededRandom() * players) + 1;
+                if (!wolfPositions.includes(pos)) wolfPositions.push(pos);
+            }
+
+            // 結果表示
+            const resultDiv = document.getElementById('result');
+            if (wolfPositions.includes(myNumber)) {
+                resultDiv.innerHTML = `<strong style="color:red; font-size:36px;">あなたはワードウルフ！</strong><br><br>お題: <strong>${selectedTheme.minority}</strong>`;
+            } else {
+                resultDiv.innerHTML = `<strong style="color:blue; font-size:36px;">あなたは多数派！</strong><br><br>お題: <strong>${selectedTheme.majority}</strong>`;
+            }
+
+            resultDiv.innerHTML += `<br><br><small>全員確認したら議論開始！</small>`;
+
+            // 操作部分を隠す
+            document.getElementById('revealBtn').classList.add('hidden');
+            document.getElementById('timer').classList.add('hidden');
+            document.getElementById('guide').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
