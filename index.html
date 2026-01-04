@@ -15,7 +15,7 @@
             color: #333;
             position: relative;
             min-height: 100vh;
-            padding-bottom: 150px; /* ボタン分の余白を確保 */
+            padding-bottom: 150px;
         }
         h1 { font-size: 48px; margin-bottom: 30px; }
         input, button, select { 
@@ -38,12 +38,24 @@
             font-size: 52px; 
             margin: 60px; 
             position: relative; 
-            z-index: 101; /* 時計を最前面に！ */
+            z-index: 101; 
             background: rgba(255,255,255,0.8); 
             padding: 10px 20px; 
             border-radius: 15px; 
         }
-        #discussionTimer { font-size: 90px; margin: 50px; text-shadow: 4px 4px 10px #aaa; }
+        #discussionTimer { 
+            font-size: 100px; 
+            font-weight: bold; 
+            margin: 40px auto; 
+            padding: 20px; 
+            background: rgba(255,255,255,0.9); 
+            border-radius: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            max-width: 500px; 
+            text-shadow: 4px 4px 10px #aaa; 
+            position: relative;
+            z-index: 50;
+        }
         #result { 
             font-size: 28px; 
             margin: 60px auto; 
@@ -63,7 +75,7 @@
             position: relative; 
             z-index: 1; 
         }
-        #voteSection, #resultSection { 
+        #voteSection, #resultSection, #reversalSection { 
             font-size: 24px; 
             margin: 40px auto; 
             max-width: 600px; 
@@ -74,7 +86,8 @@
         }
         .win { color: #0a0; font-size: 52px; animation: bounce 1.5s infinite; }
         .lose { color: #c00; font-size: 52px; animation: shake 0.8s; }
-        #nextGameBtn { 
+        .reversal-win { color: #c00; font-size: 48px; animation: bounce 1.5s infinite; } /* ウルフ逆転勝利は赤 */
+        #nextGameBtn, #reversalBtn { 
             padding: 30px 70px; 
             font-size: 40px; 
             margin: 80px auto; 
@@ -87,8 +100,8 @@
             position: relative;
             z-index: 10;
         }
-        #nextGameBtn:hover { transform: scale(1.1); }
-        /* お題を見るボタン：さらに下に移動して小さく */
+        #reversalBtn { background: linear-gradient(#ff9800, #f57c00); }
+        #nextGameBtn:hover, #reversalBtn:hover { transform: scale(1.1); }
         #revealBtn {
             padding: 16px 45px;
             font-size: 30px;
@@ -99,7 +112,7 @@
             cursor: pointer;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             position: fixed;
-            bottom: 30px; /* さらに下に！ */
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 100;
@@ -130,7 +143,7 @@
     </div>
 
     <div id="guide" class="hidden">
-        <p>進行役が時間を指定するので、<br>その時間にボタンを押してください！</p>
+        <p>進行役が時間を指定しますので、<br>その時間にボタンを押してください！</p>
         <p><strong>±2秒以内</strong>に押せば全員同じお題になります</p>
     </div>
 
@@ -158,6 +171,15 @@
         <button onclick="showFinalResult()">結果を見る</button>
     </div>
 
+    <div id="reversalSection" class="hidden">
+        <h2>逆転チャレンジ！</h2>
+        <p>ウルフ側は多数派のお題を当ててください！</p>
+        <input type="text" id="guessWord" placeholder="多数派のお題を入力">
+        <button onclick="checkReversal()">回答する</button>
+    </div>
+
+    <button id="reversalBtn" class="hidden" onclick="startReversal()">逆転チャレンジ開始！</button>
+
     <button id="nextGameBtn" class="hidden" onclick="nextGame()">次のゲームへ 🎊</button>
 
     <!-- 効果音 -->
@@ -166,54 +188,15 @@
     <audio id="beepSound" src="https://cdn.pixabay.com/download/audio/2022/05/24/audio_8e2e6f7d6d.mp3?filename=beep-6269.mp3"></audio>
 
     <script>
-        const themes = [
-            { majority: "ささやきベラドンナの毒弓", minority: "ベラドンナの影毒弓" },
-            { majority: "赤ランの首飾り", minority: "白ユリの首飾り" },
-            { majority: "白のクイーン", minority: "黒のクイーン" },
-            { majority: "コールドミラー", minority: "アイスフラワー" },
-            { majority: "メイジの帽子", minority: "憎たらしい帽子・ハロルド" },
-            { majority: "招きネコ", minority: "ネコの精霊" },
-            { majority: "古代の石：フリーズ", minority: "古代の石：フレイム" },
-            { majority: "木の剣", minority: "ホウキ" },
-            { majority: "ホウキ", minority: "シャベル" },
-            { majority: "月の盾", minority: "月の鎧" },
-            { majority: "ホウキ", minority: "シャベル" },
-            { majority: "ネズミ", minority: "ハリネズミ" },
-            { majority: "ミス・フォーチュン", minority: "ミセス・ストラグルズ" },
-            { majority: "ハイマナポーション", minority: "マナポーション" },
-            { majority: "コールドミラー", minority: "アイスフラワー" },
-            { majority: "メイジの帽子", minority: "憎たらしい帽子・ハロルド" },
-            { majority: "招きネコ", minority: "ネコの精霊" },
-            { majority: "古代の石：フリーズ", minority: "古代の石：フレイム" },
-            { majority: "ヒートスピア", minority: "ヒートダガー" },
-            { majority: "ホウキ", minority: "シャベル" },
-            { majority: "常炎", minority: "ソラリス" },
-            { majority: "ダブルアックス", minority: "ベリーロングスピア" },
-            { majority: "富のブタちゃん", minority: "幸運のブタちゃん" },
-            { majority: "ヘビ", minority: "カメ" },
-            { majority: "破滅のグレートソード", minority: "あまりにも大きすぎるブラッドソーン" },
-            { majority: "カタナ", minority: "チェーンウィップ" },
-            { majority: "便利ポーチ", minority: "学者のカバン" },
-            { majority: "カップケーキ・スラバート", minority: "ライト・スラバート" },
-            { majority: "極楽チュン", minority: "カラス" },
-            { majority: "ダブルレインボー", minority: "レインボーバッジ" },
-            { majority: "アナグマのルーン", minority: "武器エンチャント" },
-            { majority: "プラチナ会員カード", minority: "ユニークなユニーク" },
-            { majority: "ちょっと力を！", minority: "もっと力を！" },
-            { majority: "キノコ農園", minority: "深堀り" },
-            { majority: "勇敢な子狼", minority: "力持ちの子狼" },
-            { majority: "活力のパズルバッグ", minority: "活力のアミュレット" },
-            { majority: "未鑑定のアミュレット", minority: "未知のスキル" },
-            { majority: "財宝の箱", minority: "富の宝箱" },
-            { majority: "燃えるたいまつ", minority: "魔法のたいまつ" },
-            { majority: "ウイングブーツ", minority: "石のブーツ" },
-            { majority: "王の冠", minority: "輝ける王冠" },
-            { majority: "キング・スラバート", minority: "ホーリースピア" },
-            { majority: "突きキバの短弓", minority: "フォルトゥナの願い弓" }
-];
+        const wordGroups = [
+            { group: "バッグ", words: ["守護のハンドバッグ", "ウエストポーチ", "革のカバン", "スタミナバッグ", "ポーションベルト"] },
+            { group: "序盤武器", words: ["木の剣", "フライパン", "ホウキ"] },
+            { group: "トレード", words: ["会員カード", "プラチナ会員カード", "天秤", "従業員の制服", "チェストナット君"] }
+ 　　　　　　];
 
-
-        let selectedTheme = null;
+        let selectedGroup = null;
+        let majorityWord = null;
+        let minorityWord = null;
         let wolfPositions = [];
         let discussionInterval = null;
 
@@ -254,8 +237,17 @@
                 return (seed - 1) / 2147483646;
             }
 
-            const themeIndex = Math.floor(seededRandom() * themes.length);
-            selectedTheme = themes[themeIndex];
+            const groupIndex = Math.floor(seededRandom() * wordGroups.length);
+            selectedGroup = wordGroups[groupIndex];
+
+            let words = selectedGroup.words.slice();
+            for (let i = words.length - 1; i > 0; i--) {
+                const j = Math.floor(seededRandom() * (i + 1));
+                [words[i], words[j]] = [words[j], words[i]];
+            }
+
+            majorityWord = words[0];
+            minorityWord = words[1];
 
             wolfPositions = [];
             while (wolfPositions.length < wolves) {
@@ -267,9 +259,9 @@
             resultDiv.classList.remove('hidden');
             resultDiv.innerHTML = '<img src="https://thumb.ac-illust.com/ca/ca19b1b823b60a02eeb8db837fd866db_t.jpeg" class="game-img" alt="かわいい狼"><br>';
             if (wolfPositions.includes(myNumber)) {
-                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">紛れ込んだ狼を特定せよ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.minority}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:red; font-size:48px;">あなたはワードウルフ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${minorityWord}</strong>`;
             } else {
-                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">紛れ込んだ狼を特定せよ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${selectedTheme.majority}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">あなたは多数派！👥</strong><br><br>お題: <strong style="font-size:42px;">${majorityWord}</strong>`;
             }
             resultDiv.innerHTML += `<br><br><small style="font-size:24px;">議論スタート！🕒</small>`;
 
@@ -277,12 +269,13 @@
             document.getElementById('timer').classList.add('hidden');
             document.getElementById('guide').classList.add('hidden');
 
+            document.getElementById('discussionTimer').classList.remove('hidden');
             startDiscussionTimer();
+
             initVoteOptions();
         }
 
         function startDiscussionTimer() {
-            document.getElementById('discussionTimer').classList.remove('hidden');
             let timeLeft = 180;
             const timerDiv = document.getElementById('discussionTimer');
 
@@ -339,21 +332,50 @@
             const isWolfBanished = wolfPositions.includes(banished);
 
             if (isWolfBanished) {
-                resultDiv.innerHTML += `<br><img src="https://img.freepik.com/premium-photo/animated-victory-celebration-with-trophy-confetti-isolated-with-white-highlights_660230-185310.jpg" class="game-img" alt="勝利祝賀"><br><div class="win">🎉 多数派（市民）の勝利！ 🎉</div><br>`;
+                // 多数派勝利（ウルフ追放成功） → 少数派のお題公開 + 逆転チャレンジ可能
+                resultDiv.innerHTML += `<br><div class="win">🎉 多数派の勝利！（ウルフ追放成功）</div><br>`;
                 resultDiv.innerHTML += `<strong style="font-size:36px;">追放者 ${banished}番 はワードウルフでした！</strong><br><br>`;
+                resultDiv.innerHTML += `<strong style="font-size:36px;">ウルフのお題は「${minorityWord}」でした！</strong><br><br>`;
+                resultDiv.innerHTML += `<strong style="font-size:32px;">ウルフ側は多数派のお題を当てて逆転できます！</strong><br>`;
                 document.getElementById('victorySound').play();
+
+                document.getElementById('reversalBtn').classList.remove('hidden');
             } else {
-                resultDiv.innerHTML += `<br><img src="https://media.tenor.com/nq6C5xO1W0gAAAAM/trombone-pusheen.gif" class="game-img" alt="サッドトロンボーン"><br><div class="lose">😈 少数派（ワードウルフ）の勝利！ 😈</div><br>`;
+                // 少数派勝利（ウルフ生存） → お題非公開で終了
+                resultDiv.innerHTML += `<br><div class="lose">😈 少数派（ワードウルフ）の完全勝利！ 😈</div><br>`;
                 resultDiv.innerHTML += `<strong style="font-size:36px;">追放者 ${banished}番 は多数派でした...</strong><br><br>`;
                 document.getElementById('loseSound').play();
+
+                document.getElementById('nextGameBtn').classList.remove('hidden');
             }
 
-            resultDiv.innerHTML += `<strong style="font-size:32px;">ワードウルフは ${wolfPositions.join(', ')}番 でした！</strong>`;
+            resultDiv.innerHTML += `<strong style="font-size:28px;">ワードウルフは ${wolfPositions.join(', ')}番 でした！</strong>`;
 
             document.getElementById('voteSection').classList.add('hidden');
             document.getElementById('resultSection').classList.add('hidden');
             document.getElementById('discussionTimer').classList.add('hidden');
+        }
 
+        function startReversal() {
+            document.getElementById('reversalBtn').classList.add('hidden');
+            document.getElementById('reversalSection').classList.remove('hidden');
+        }
+
+        function checkReversal() {
+            const guess = document.getElementById('guessWord').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            if (guess === majorityWord) {
+                resultDiv.innerHTML += `<br><div class="reversal-win">😈 ウルフの逆転勝利！！ 😈</div><br>`;
+                resultDiv.innerHTML += `<strong style="font-size:40px;">ウルフ側が多数派のお題「${majorityWord}」を当てました！逆転成功！</strong>`;
+                document.getElementById('loseSound').play(); // ウルフ勝利なのでloseSound
+            } else {
+                resultDiv.innerHTML += `<br><div class="win">🎉 多数派の完全勝利！！ 🎉</div><br>`;
+                resultDiv.innerHTML += `<strong style="font-size:40px;">逆転失敗...正解は「${majorityWord}」でした。多数派の完全勝利！</strong>`;
+                document.getElementById('victorySound').play();
+            }
+
+            document.getElementById('reversalSection').classList.add('hidden');
             document.getElementById('nextGameBtn').classList.remove('hidden');
         }
 
@@ -365,8 +387,11 @@
             document.getElementById('discussionTimer').classList.add('hidden');
             document.getElementById('voteSection').classList.add('hidden');
             document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('reversalSection').classList.add('hidden');
+            document.getElementById('reversalBtn').classList.add('hidden');
             document.getElementById('nextGameBtn').classList.add('hidden');
             document.getElementById('myVote').innerHTML = '';
+            document.getElementById('guessWord').value = '';
             if (document.querySelector('#voteSection button')) {
                 document.querySelector('#voteSection button').disabled = false;
             }
