@@ -191,7 +191,15 @@
         const wordGroups = [
             { group: "バッグ", words: ["守護のハンドバッグ", "ウエストポーチ", "革のカバン", "スタミナバッグ", "ポーションベルト"] },
             { group: "序盤武器", words: ["木の剣", "フライパン", "ホウキ"] },
-            { group: "トレード", words: ["会員カード", "プラチナ会員カード", "天秤", "従業員の制服", "チェストナット君"] }
+            { group: "トレード", words: ["会員カード", "プラチナ会員カード", "天秤", "従業員の制服", "チェストナット君"] },
+            { group: "グレソ", words: ["あまりにも大きすぎるブラッドソーン", "ヒートグレートソード", "破滅のグレートソード", "グレートソード"] },
+            { group: "どんぐり", words: ["ドングリの首飾り", "青セージの首飾り", "赤ランの首飾り", "白ユリの首飾り"] },
+            { group: "弱い初期カバン", words: ["裁縫セット", "学者のカバン", "たき火台", "便利ポーチ","棺型バッグ"] },
+            { group: "強い初期カバン", words: ["施し袋", "学者のカバン", "供物皿", "便利ポーチ", "レリックケース"] },
+            { group: "動物", words: ["カメ", "ヘビ", "カラス", "リス", "ハリネズミ", "ネズミ"] },
+            { group: "食べ物", words: ["バナナ", "ニンニク", "ブルーベリー", "パイナップル", "スノーケーキ", "パンプキン", "ニンジン", "エサの盛り合わせ", "ハメツダケ", "トウガラシ", "チーズ", "ブロッコリー", "トウガラシ", "カップケーキ", "ベニテングダケ"] },
+            { group: "ダガー", words: ["ブラッディダガー", "ダガー", "ポイズンダガー", , "ゴーストダガー", "呪われしダガー", "ヒートダガー", "ダガーラン"] },
+            { group: "金策", words: ["富のブタちゃん", "投資機会", "ブタちゃん貯金箱", "富の宝箱"] },
  　　　　　　];
 
         let selectedGroup = null;
@@ -227,7 +235,7 @@
             const wolves = parseInt(document.getElementById('wolves').value);
             const myNumber = parseInt(document.getElementById('myNumber').value);
 
-            const now = new Date().getTime();
+                        const now = new Date().getTime();
             const tolerance = 2;
             const roundedTime = Math.floor(now / 1000 / tolerance) * tolerance * 1000;
             let seed = roundedTime + players * 100000 + wolves * 10000;
@@ -401,4 +409,5 @@
     </script>
 </body>
 </html>
+
 
