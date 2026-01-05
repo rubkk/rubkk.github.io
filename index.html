@@ -195,7 +195,7 @@
             { group: "グレソ", words: ["あまりにも大きすぎるブラッドソーン", "ヒートグレートソード", "破滅のグレートソード", "グレートソード"] },
             { group: "どんぐり", words: ["ドングリの首飾り", "青セージの首飾り", "赤ランの首飾り", "白ユリの首飾り"] },
             { group: "弱い初期カバン", words: ["裁縫セット", "学者のカバン", "たき火台", "便利ポーチ","棺型バッグ"] },
-            { group: "強い初期カバン", words: ["施し袋", "学者のカバン", "供物皿", "便利ポーチ", "レリックケース"] },
+            { group: "強い初期カバン", words: ["施し袋", "パズルボックス", "供物皿", "便利ポーチ", "レリックケース", "レンジャーのカバン", "鶴織りバスケット"] },
             { group: "動物", words: ["カメ", "ヘビ", "カラス", "リス", "ハリネズミ", "ネズミ"] },
             { group: "食べ物", words: ["バナナ", "ニンニク", "ブルーベリー", "パイナップル", "スノーケーキ", "パンプキン", "ニンジン", "エサの盛り合わせ", "ハメツダケ", "トウガラシ", "チーズ", "ブロッコリー", "トウガラシ", "カップケーキ", "ベニテングダケ"] },
             { group: "ダガー", words: ["ブラッディダガー", "ダガー", "ポイズンダガー", , "ゴーストダガー", "呪われしダガー", "ヒートダガー", "ダガーラン"] },
@@ -267,9 +267,9 @@
             resultDiv.classList.remove('hidden');
             resultDiv.innerHTML = '<img src="https://thumb.ac-illust.com/ca/ca19b1b823b60a02eeb8db837fd866db_t.jpeg" class="game-img" alt="かわいい狼"><br>';
             if (wolfPositions.includes(myNumber)) {
-                resultDiv.innerHTML += `<strong style="color:red; font-size:48px;">あなたはワードウルフ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${minorityWord}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:red; font-size:48px;">紛れ込んだ狼を特定せよ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${minorityWord}</strong>`;
             } else {
-                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">あなたは多数派！👥</strong><br><br>お題: <strong style="font-size:42px;">${majorityWord}</strong>`;
+                resultDiv.innerHTML += `<strong style="color:blue; font-size:48px;">紛れ込んだ狼を特定せよ！🐺</strong><br><br>お題: <strong style="font-size:42px;">${majorityWord}</strong>`;
             }
             resultDiv.innerHTML += `<br><br><small style="font-size:24px;">議論スタート！🕒</small>`;
 
@@ -409,5 +409,6 @@
     </script>
 </body>
 </html>
+
 
 
