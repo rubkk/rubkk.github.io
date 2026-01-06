@@ -200,6 +200,11 @@
             { group: "食べ物", words: ["バナナ", "ニンニク", "ブルーベリー", "パイナップル", "スノーケーキ", "パンプキン", "ニンジン", "エサの盛り合わせ", "ハメツダケ", "トウガラシ", "チーズ", "ブロッコリー", "トウガラシ", "カップケーキ", "ベニテングダケ"] },
             { group: "ダガー", words: ["ブラッディダガー", "ダガー", "ポイズンダガー", , "ゴーストダガー", "呪われしダガー", "ヒートダガー", "ダガーラン"] },
             { group: "金策", words: ["富のブタちゃん", "投資機会", "ブタちゃん貯金箱", "富の宝箱"] },
+            { group: "吸血", words: ["ブラッディダガー", "黒のナイト", "トラのルーン", "極吸血のポーション", "夜闇のヘアコーム", "赤ランの首飾り", "ブラッドソーン", "ブラッディ・スラバート", "吸血グローブ", "フロストバイト",
+                                   "血のアミュレット", "血の大鎌", "飢えたる剣", "吸血のポーション"] },
+            { group: "ポーション", words: ["極吸血のポーション", "凶悪鬼のフラスコ", "悪鬼のフラスコ", "ハイマナポーション", "強疫毒のフラスコ", "吸血のポーション", "聖なるポーション", "疫毒のポーション", "マナポーション",
+                                      "硬肌のポーション", "ヘルスポーション"] }
+
  　　　　　　];
 
         let selectedGroup = null;
@@ -210,7 +215,7 @@
 
         function startGame() {
             const players = parseInt(document.getElementById('players').value);
-            const wolves = parseInt(document.getElementById('wolves').value);
+            const wolves = parseInt(document.getElementById('wolves').value);    
             const myNumber = parseInt(document.getElementById('myNumber').value);
 
             if (myNumber < 1 || myNumber > players) {
@@ -409,6 +414,7 @@
     </script>
 </body>
 </html>
+
 
 
 
